@@ -1,8 +1,19 @@
 # Fitness Machine Service
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=michaelw&repository=hassio-ftms&category=integration)
+
 [Home Assistant](https://www.home-assistant.io/) [HACS](https://hacs.xyz/) custom component for working with fitness equipment with a Bluetooth interface.
 
-The component is based on the [pyftms](https://github.com/dudanov/pyftms) library, which complies with the [Bluetooth Fitness Machine Service v1.0 standard](https://www.bluetooth.com/specifications/specs/fitness-machine-service-1-0/).
+This fork is based on the upstream project and includes production fixes for
+reserved training status handling and Wahoo KICKR CORE v2 interoperability.
+It depends on the forked
+[pyftms](https://github.com/michaelw/python-pyftms) release tag
+`v0.4.15+mw.1`.
+
+The component is based on the
+[pyftms](https://github.com/michaelw/python-pyftms) library, which complies
+with the
+[Bluetooth Fitness Machine Service v1.0 standard](https://www.bluetooth.com/specifications/specs/fitness-machine-service-1-0/).
 
 Component capabilities:
 
@@ -25,7 +36,10 @@ Device view example for `FitShow FS-BT-D2 Indoor bike` fitness machine:
 
 ### HACS
 
-Follow [this guide](https://hacs.xyz/docs/faq/custom_repositories/) to add this git repository as a custom HACS repository. Then install from HACS as normal.
+Follow [this guide](https://hacs.xyz/docs/faq/custom_repositories/) to add
+this fork as a custom HACS repository. Then install from HACS as normal.
+Home Assistant will install the matching forked `pyftms` dependency from the
+tagged GitHub release reference in the integration manifest.
 
 ### Manual Installation
 
@@ -34,7 +48,8 @@ Copy `custom_components/ftms` into your Home Assistant `$HA_HOME/config` directo
 ## Disclaimer
 
 Since there is a lot of different equipment that I do not own, and given the fact that not all manufacturers follow the FTMS standard strictly, some functions may not work correctly or not work at all.
-Please create an [issue](https://github.com/dudanov/hassio-ftms/issues), and I will try to help solve the problem.
+Please create an [issue](https://github.com/michaelw/hassio-ftms/issues), and I
+will try to help solve the problem.
 
 ## Support
 
