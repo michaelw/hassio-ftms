@@ -5,10 +5,11 @@
 [Home Assistant](https://www.home-assistant.io/) [HACS](https://hacs.xyz/) custom component for working with fitness equipment with a Bluetooth interface.
 
 This fork is based on the upstream project and includes production fixes for
-reserved training status handling and Wahoo KICKR CORE v2 interoperability.
+reserved training status handling, Wahoo KICKR CORE v2 interoperability, and
+zero-value FTMS sensor updates.
 It depends on the forked
 [pyftms](https://github.com/michaelw/python-pyftms) release tag
-`v0.4.15+mw.1`.
+`v0.4.15+mw.2`.
 
 The component is based on the
 [pyftms](https://github.com/michaelw/python-pyftms) library, which complies
