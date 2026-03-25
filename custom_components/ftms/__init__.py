@@ -1,5 +1,6 @@
 """The FTMS integration."""
 
+from contextlib import suppress
 import logging
 
 import pyftms
@@ -72,7 +73,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: FtmsConfigEntry) -> bool
     try:
         await ftms.connect()
 
+    except TimeoutError as exc:
+        _LOGGER.warning(
+            "Timed out while initializing FTMS device %s during startup; "
+            "Home Assistant will retry setup automatically: %s",
+            address,
+            exc,
+        )
+        with suppress(BleakError, TimeoutError):
+            await ftms.disconnect()
+        raise ConfigEntryNotReady(translation_key="startup_timeout") from exc
+
     except BleakError as exc:
+        _LOGGER.warning(
+            "Unable to initialize FTMS device %s during startup; "
+            "Home Assistant will retry setup automatically: %s",
+            address,
+            exc,
+        )
+        with suppress(BleakError, TimeoutError):
+            await ftms.disconnect()
         raise ConfigEntryNotReady(translation_key="connection_failed") from exc
 
     assert ftms.machine_type.name
