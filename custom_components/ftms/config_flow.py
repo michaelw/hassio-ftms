@@ -34,6 +34,12 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+try:
+    from pyftms import get_machine_type_from_advertisement
+
+except ImportError:
+    get_machine_type_from_advertisement = get_machine_type_from_service_data
+
 
 class OptionsFlowHandler(OptionsFlowWithConfigEntry):
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -118,7 +124,7 @@ class FTMSConfigFlow(ConfigFlow, domain=DOMAIN):
                 continue
 
             try:
-                get_machine_type_from_service_data(info.advertisement)
+                get_machine_type_from_advertisement(info.advertisement)
 
             except NotFitnessMachineError:
                 continue
@@ -144,7 +150,7 @@ class FTMSConfigFlow(ConfigFlow, domain=DOMAIN):
         """Handle the bluetooth discovery step."""
 
         try:
-            get_machine_type_from_service_data(info.advertisement)
+            get_machine_type_from_advertisement(info.advertisement)
 
         except NotFitnessMachineError:
             return self.async_abort(reason="not_supported")
@@ -254,9 +260,14 @@ class FTMSConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             unique_id = self._ftms.address
             await self.async_set_unique_id(unique_id, raise_on_progress=False)
+            self._abort_if_unique_id_configured()
 
             s1 = self._ftms.device_info.get("manufacturer", "FTMS")
-            s2 = self._ftms.device_info.get("model", "GENERIC")
+            s2 = (
+                self._ftms.device_info.get("model")
+                or self._ble_info.name
+                or "GENERIC"
+            )
             s3 = f"({self._ftms.device_info.get("serial_number", unique_id)})"
 
             return self.async_create_entry(
