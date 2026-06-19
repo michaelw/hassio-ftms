@@ -60,8 +60,10 @@ class _FakeHass:
 
 
 class _FakeInfo:
-    def __init__(self, *, name="TRAINER", advertisement=None, device=None):
-        self.address = FTMS_ADDRESS
+    def __init__(
+        self, *, address=FTMS_ADDRESS, name="TRAINER", advertisement=None, device=None
+    ):
+        self.address = address
         self.name = name
         self.advertisement = advertisement or types.SimpleNamespace(ftms=True)
         self.device = device or object()
@@ -89,7 +91,14 @@ class FtmsConfigFlowTests(unittest.TestCase):
         ]:
             sys.modules.pop(name, None)
 
-    def _load_module(self, *, client=None, connection_error=None, discovered_infos=None):
+    def _load_module(
+        self,
+        *,
+        client=None,
+        connection_error=None,
+        discovered_infos=None,
+        on_connect=None,
+    ):
         calls = []
 
         package = types.ModuleType("custom_components.ftms")
@@ -111,6 +120,8 @@ class FtmsConfigFlowTests(unittest.TestCase):
 
         async def establish_connection(**kwargs):
             calls.append(kwargs)
+            if on_connect is not None:
+                on_connect()
             if connection_error:
                 raise connection_error
             return client
@@ -127,7 +138,7 @@ class FtmsConfigFlowTests(unittest.TestCase):
             lambda hass, address: hass.ble_device
         )
         ha_bluetooth.async_discovered_service_info = (
-            lambda hass: discovered_infos or []
+            lambda hass: discovered_infos if discovered_infos is not None else []
         )
         ha_bluetooth.async_last_service_info = lambda hass, address: None
         sys.modules["homeassistant"] = ha
@@ -288,6 +299,34 @@ class FtmsConfigFlowTests(unittest.TestCase):
         self.assertEqual(result, {"type": "abort", "reason": "no_devices_found"})
         self.assertEqual(len(calls), 1)
         self.assertEqual(client.disconnect_calls, 1)
+
+    def test_user_discovery_snapshots_candidates_before_verification(self):
+        client = _FakeClient(
+            {
+                "1826": _FakeService(
+                    {"2ad2": _FakeCharacteristic(properties=["notify"])}
+                )
+            }
+        )
+        discovered_infos = {FTMS_ADDRESS: _FakeInfo()}
+
+        def add_discovery():
+            discovered_infos["00:00:5E:00:2E:44"] = _FakeInfo(
+                address="00:00:5E:00:2E:44"
+            )
+
+        module, calls = self._load_module(
+            client=client,
+            discovered_infos=discovered_infos.values(),
+            on_connect=add_discovery,
+        )
+        flow = self._flow(module, ble_device=object())
+
+        result = asyncio.run(flow.async_step_user())
+
+        self.assertEqual(result["type"], "form")
+        self.assertEqual(result["step_id"], "user")
+        self.assertEqual(len(calls), 1)
 
     def test_configured_device_suppresses_duplicate_before_verification(self):
         client = _FakeClient(
