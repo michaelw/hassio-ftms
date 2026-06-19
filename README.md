@@ -8,10 +8,11 @@ This fork is based on the upstream project and includes production fixes for
 reserved training status handling, Wahoo KICKR CORE v2 interoperability, and
 zero-value FTMS sensor updates, plus KICKR UUID-only FTMS discovery,
 startup retry hardening with active GATT verification, and concurrency
-hardening for mutable discovery and callback state.
+hardening for mutable discovery and callback state, plus Bodytone-style GATT
+machine type detection.
 It depends on the forked
 [pyftms](https://github.com/michaelw/python-pyftms) release tag
-`v0.4.15+mw.5`.
+`v0.4.15+mw.6`.
 
 The component is based on the
 [pyftms](https://github.com/michaelw/python-pyftms) library, which complies
