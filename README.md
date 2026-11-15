@@ -9,10 +9,11 @@ reserved training status handling, Wahoo KICKR CORE v2 interoperability, and
 zero-value FTMS sensor updates, plus KICKR UUID-only FTMS discovery,
 startup retry hardening with active GATT verification, and concurrency
 hardening for mutable discovery and callback state, plus Bodytone-style GATT
-machine type detection.
+machine type detection. Fork release `v0.24.6+mw.10` also fixes reserved
+Training Status flag formatting and logging through its pyftms dependency.
 It depends on the forked
 [pyftms](https://github.com/michaelw/python-pyftms) release tag
-`v0.4.15+mw.6`.
+`v0.4.15+mw.7`.
 
 The component is based on the
 [pyftms](https://github.com/michaelw/python-pyftms) library, which complies
